@@ -1,39 +1,45 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import React from 'react';
+import { Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import HomeScreen from '../screens/HomeScreen';
+import LibraryScreen from '../screens/LibraryScreen';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Tabs
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          // Use route.name for icon selection
+          if (route.name === 'index') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'library') {
+            iconName = focused ? 'library' : 'library-outline';
+          } else {
+            iconName = focused ? 'document' : 'document-outline'; // Fallback icon
+          }
+          
+          // Return null if iconName is undefined to prevent crashes
+          return iconName ? <Ionicons name={iconName} size={size} color={color} /> : null;
+        },
+        tabBarActiveTintColor: '#ff0000',
+        tabBarInactiveTintColor: 'gray',
+      })}
+    >
+      <Tabs.Screen 
+        name="index" 
+        options={{ 
+          title: 'Download',
+          headerTitle: 'YouTube Video Downloader'
+        }}
+      />
+      <Tabs.Screen 
+        name="library" 
+        options={{ 
+          title: 'My Videos',
+          headerTitle: 'My Downloaded Videos'
+        }}
+      />
+    </Tabs>
   );
 }
